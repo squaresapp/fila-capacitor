@@ -4,20 +4,20 @@ class FilaCapacitor extends Fila
 	/** */
 	static async use()
 	{
-		const cwd = this.directory.Data;
-		const tmp = this.directory.Cache;
+		const cwd = this.directory.data;
+		const tmp = this.directory.cache;
 		const sep = "/";
 		Fila.setDefaults(FilaCapacitor, sep, cwd, tmp);
 	}
 	
 	/** Values copied from Capacitor. */
-	private static readonly directory = {
-		Cache: "CACHE",
-		Data: "DATA",
-		Documents: "DOCUMENTS",
-		External: "EXTERNAL",
-		ExternalStorage: "EXTERNAL_STORAGE",
-		Library: "LIBRARY"
+	static readonly directory = {
+		cache: "CACHE",
+		data: "DATA",
+		documents: "DOCUMENTS",
+		external: "EXTERNAL",
+		externalStorage: "EXTERNAL_STORAGE",
+		library: "LIBRARY",
 	} as const;
 	
 	/** */
@@ -31,11 +31,20 @@ class FilaCapacitor extends Fila
 		return fs as typeof import("@capacitor/filesystem").Filesystem;
 	}
 	
+	/**
+	 * Gets the fully-qualified path, including any file name to the
+	 * file system object being represented by this Fila object.
+	 */
+	get path()
+	{
+		return Fila.join(...this.components);
+	}
+	
 	/** */
 	async readText()
 	{
 		const result = await this.fs.readFile({
-			path: this.path,
+			...this.getDefaultOptions(),
 			encoding: "utf8" as any
 		});
 		
@@ -45,7 +54,11 @@ class FilaCapacitor extends Fila
 	/** */
 	async readBinary()
 	{
-		const result = await this.fs.readFile({ path: this.path });
+		const result = await this.fs.readFile({
+			...this.getDefaultOptions(),
+			encoding: "ascii" as any
+		});
+		
 		const base64 = result.data;
 		return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
 	}
@@ -53,7 +66,7 @@ class FilaCapacitor extends Fila
 	/** */
 	async readDirectory()
 	{
-		const result = await this.fs.readdir({ path: this.path });
+		const result = await this.fs.readdir(this.getDefaultOptions());
 		const filas: Fila[] = [];
 		
 		for (const file of result.files)
@@ -73,12 +86,14 @@ class FilaCapacitor extends Fila
 				await up.writeDirectory();
 			
 			await this.fs.writeFile({
-				path: this.path,
-				data: text
+				...this.getDefaultOptions(),
+				data: text,
+				encoding: "utf8" as any,
 			});
 		}
 		catch (e)
 		{
+			console.error("Write failed to path: " + this.path);
 			debugger;
 		}
 	}
@@ -88,7 +103,11 @@ class FilaCapacitor extends Fila
 	{
 		await this.up().writeDirectory();
 		const data = await this.arrayBufferToBase64(arrayBuffer);
-		await this.fs.writeFile({ path: this.path, data });
+		await this.fs.writeFile({
+			...this.getDefaultOptions(),
+			data,
+			encoding: "ascii" as any
+		});
 	}
 	
 	/** */
@@ -113,7 +132,7 @@ class FilaCapacitor extends Fila
 	async writeDirectory()
 	{
 		await this.fs.mkdir({
-			path: this.path,
+			...this.getDefaultOptions(),
 			recursive: true
 		});
 	}
@@ -137,7 +156,7 @@ class FilaCapacitor extends Fila
 			return new Promise<Error | void>(async r =>
 			{
 				await this.fs.rmdir({
-					path: this.path,
+					...this.getDefaultOptions(),
 					recursive: true
 				});
 				
@@ -157,9 +176,14 @@ class FilaCapacitor extends Fila
 	/** */
 	async copy(target: Fila)
 	{
+		const fromOptions = this.getDefaultOptions();
+		const toOptions = this.getDefaultOptions(target.path);
+		
 		await this.fs.copy({
-			from: this.path,
-			to: target.path
+			from: fromOptions.path,
+			directory: fromOptions.directory,
+			to: toOptions.path,
+			toDirectory: toOptions.directory,
 		});
 	}
 	
@@ -167,14 +191,21 @@ class FilaCapacitor extends Fila
 	async rename(newName: string)
 	{
 		const target = this.up().down(newName).path;
+		const fromOptions = this.getDefaultOptions();
+		const toOptions = this.getDefaultOptions(target);
+		
 		await this.fs.rename({
 			from: this.path,
-			to: target
+			directory: fromOptions.directory,
+			to: target,
+			toDirectory: toOptions.directory
 		});
 	}
 	
 	/** */
-	protected watchProtected(recursive: boolean, callbackFn: (event: Fila.Event, fila: Fila) => void): () => void
+	protected watchProtected(
+		recursive: boolean,
+		callbackFn: (event: Fila.Event, fila: Fila) => void): () => void
 	{
 		throw new Error("Not implemented");
 	}
@@ -182,27 +213,25 @@ class FilaCapacitor extends Fila
 	/** */
 	async exists()
 	{
-		const stat = await this.getStat()
-		debugger;
-		return true;
+		return !!await this.getStat();
 	}
 	
 	/** */
 	async getSize()
 	{
-		return (await this.getStat()).size;
+		return (await this.getStat())?.size || 0;
 	}
 	
 	/** */
 	async getModifiedTicks()
 	{
-		return (await this.getStat()).mtime;
+		return (await this.getStat())?.mtime || 0;
 	}
 	
 	/** */
 	async getCreatedTicks()
 	{
-		return (await this.getStat()).ctime || 0;
+		return (await this.getStat())?.ctime || 0;
 	}
 	
 	/** */
@@ -214,13 +243,43 @@ class FilaCapacitor extends Fila
 	/** */
 	async isDirectory()
 	{
-		return (await this.getStat()).type === "directory";
+		return (await this.getStat())?.type === "directory";
 	}
 	
 	/** */
 	private async getStat()
 	{
-		return await this.fs.stat({ path: this.path });
+		try
+		{
+			return await this.fs.stat(this.getDefaultOptions());
+		}
+		catch (e) { return null; }
+	}
+	
+	/** */
+	private getDefaultOptions(targetPath: string = this.path)
+	{
+		const slash = targetPath.indexOf("/");
+		let path = "";
+		let directory = "";
+		
+		if (slash < 0)
+		{
+			path = targetPath;
+			directory = FilaCapacitor.directory.cache as import("@capacitor/filesystem").Directory.Cache
+		}
+		else
+		{
+			path = targetPath.slice(slash + 1);
+			directory = targetPath.slice(0, slash) as import("@capacitor/filesystem").Directory.Cache;
+		}
+		
+		const result = {
+			path,
+			directory: directory as import("@capacitor/filesystem").Directory
+		};
+		
+		return result;
 	}
 }
 
