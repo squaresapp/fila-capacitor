@@ -4,15 +4,32 @@ class FilaCapacitor extends Fila
 	/** */
 	static async use()
 	{
-		const directory = {} as typeof import("@capacitor/filesystem").Directory;
-		const cwd = directory.Data;
-		const tmp = directory.Cache;
+		const cwd = this.directory.Data;
+		const tmp = this.directory.Cache;
 		const sep = "/";
 		Fila.setDefaults(FilaCapacitor, sep, cwd, tmp);
 	}
 	
+	/** Values copied from Capacitor. */
+	private static readonly directory = {
+		Cache: "CACHE",
+		Data: "DATA",
+		Documents: "DOCUMENTS",
+		External: "EXTERNAL",
+		ExternalStorage: "EXTERNAL_STORAGE",
+		Library: "LIBRARY"
+	} as const;
+	
 	/** */
-	private readonly fs: typeof import("@capacitor/filesystem").Filesystem = {} as any;
+	private get fs()
+	{
+		const g = globalThis as any;
+		const fs = g.Capacitor?.Plugins?.Filesystem;
+		if (!fs)
+			throw new Error("Filesystem plugin not added to Capacitor.");
+		
+		return fs as typeof import("@capacitor/filesystem").Filesystem;
+	}
 	
 	/** */
 	async readText()
@@ -132,9 +149,9 @@ class FilaCapacitor extends Fila
 	}
 	
 	/** */
-	move(target: Fila)
+	async move(target: Fila)
 	{
-		return null as any;
+		throw new Error("Not implemented.");
 	}
 	
 	/** */
