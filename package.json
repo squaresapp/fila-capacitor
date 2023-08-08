@@ -1,0 +1,14 @@
+{
+	"name": "fila-capacitor",
+	"author": "Paul Gordon",
+	"description": "Capacitor backend for Fila",
+	"version": "1.0.0",
+	"main": "fila-capacitor.js",
+	"scripts": {
+		"bundle": "tsc -p tsconfig.release.json && terser ./+build/fila-capacitor.debug.js > ./+build/fila-capacitor.min.js"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"@capacitor/filesystem": "^5.1.1"
+	}
+}
