@@ -77,7 +77,7 @@ class FilaCapacitor extends Fila
 	}
 	
 	/** */
-	async writeText(text: string)
+	async writeText(text: string, options?: Fila.IWriteTextOptions)
 	{
 		try
 		{
@@ -85,11 +85,16 @@ class FilaCapacitor extends Fila
 			if (!await up.exists())
 				await up.writeDirectory();
 			
-			await this.fs.writeFile({
+			const writeOptions = {
 				...this.getDefaultOptions(),
 				data: text,
-				encoding: "utf8" as any,
-			});
+				encoding: "utf8" as any
+			};
+			
+			if (options?.append)
+				await this.fs.appendFile(writeOptions);
+			else
+				await this.fs.writeFile(writeOptions);
 		}
 		catch (e)
 		{
@@ -164,7 +169,7 @@ class FilaCapacitor extends Fila
 			});
 		}
 		
-		await this.fs.deleteFile({ path: this.path });
+		await this.fs.deleteFile(this.getDefaultOptions());
 	}
 	
 	/** */
@@ -283,4 +288,5 @@ class FilaCapacitor extends Fila
 	}
 }
 
+//@ts-ignore
 typeof module === "object" && Object.assign(module.exports, { FilaCapacitor });
