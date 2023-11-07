@@ -288,5 +288,8 @@ class FilaCapacitor extends Fila
 	}
 }
 
-//@ts-ignore
-typeof module === "object" && Object.assign(module.exports, { FilaCapacitor });
+namespace FilaCapacitor
+{
+	declare const module: any;
+	typeof module === "object" && Object.assign(module.exports, { FilaCapacitor });
+}
