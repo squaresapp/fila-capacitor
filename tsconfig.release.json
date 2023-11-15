@@ -1,13 +1,13 @@
 {
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
-		"outFile": "+build/fila-capacitor.js",
+		"outFile": "+build/fila-capacitor.js"
 	},
 	"exclude": [
 		"**/+build/**/*.ts",
-		"**/*.cover.ts",
+		"**/*.cover.ts"
 	],
 	"references": [
-		{ "path": "../Fila" },
+		{ "path": "../Fila" }
 	]
 }
