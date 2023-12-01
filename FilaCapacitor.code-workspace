@@ -24,35 +24,6 @@
 		"task.allowAutomaticTasks": "on",
 	},
 	"launch": {
-		"configurations": [
-			{
-				"name": "Debug Active Cover Function (Electron)",
-				"type": "chrome",
-				"request": "launch",
-				"runtimeExecutable": "${workspaceFolder}/../Moduless/node_modules/electron/cli.js",
-				"cwd": "${workspaceFolder}",
-				"runtimeArgs": [
-					"${workspaceFolder}/../Moduless/build/moduless.js",
-					"--remote-debugging-port=9222"
-				],
-				"sourceMaps": true,
-				"timeout": 2000,
-			},
-			{
-				"name": "Debug All Cover Functions",
-				"type": "chrome",
-				"request": "launch",
-				"runtimeExecutable": "${workspaceFolder}/../node_modules/.bin/electron",
-				"cwd": "${workspaceFolder}",
-				"runtimeArgs": [
-					"${workspaceFolder}/../Moduless/build/moduless.js",
-					"--remote-debugging-port=9222",
-					"expression=(cover)"
-				],
-				"sourceMaps": true,
-				"timeout": 2000
-			}
-		]
 	},
 	"tasks": {
 		"version": "2.0.0",
@@ -79,28 +50,6 @@
 					"isDefault": true
 				},
 				"isBackground": true
-			},
-			{
-				"label": "Set Active Cover Function",
-				"type": "shell",
-				"command": "node",
-				"args": [
-					"${workspaceFolder}/node_modules/moduless/build/moduless.js",
-					"set",
-					"${file}:${lineNumber}"
-				],
-				"problemMatcher": []
-			},
-			{
-				"label": "Run All Cover Functions",
-				"type": "shell",
-				"command": "${workspaceFolder}/node_modules/.bin/electron",
-				"args": [
-					"${workspaceFolder}/node_modules/moduless/build/moduless.js",
-					"moduless",
-					"all"
-				],
-				"problemMatcher": []
 			}
 		]
 	}
