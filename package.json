@@ -3,7 +3,7 @@
 	"author": "Paul Gordon",
 	"description": "CapacitorJS backend for Fila",
 	"license": "MIT",
-	"version": "1.0.1",
+	"version": "1.0.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/scrollapp/fila-capacitor"
