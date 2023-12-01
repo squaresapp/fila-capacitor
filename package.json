@@ -1,14 +1,40 @@
 {
 	"name": "fila-capacitor",
 	"author": "Paul Gordon",
-	"description": "Capacitor backend for Fila",
-	"version": "1.0.0",
-	"main": "fila-capacitor.js",
-	"scripts": {
-		"bundle": "tsc -p tsconfig.release.json && terser ./+build/fila-capacitor.debug.js > ./+build/fila-capacitor.min.js"
-	},
+	"description": "CapacitorJS backend for Fila",
 	"license": "MIT",
+	"version": "1.0.1",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/scrollapp/fila-capacitor"
+	},
+	"bugs": {
+		"url": "https://github.com/scrollapp/fila-capacitor/issues"
+	},
+	"main": "fila-capacitor.js",
+	"browser": "fila-capacitor.js",
+	"module": "fila-capacitor.esm.js",
+	"types": "fila-capacitor.d.ts",
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"LICENSE.txt",
+		"readme.md",
+		"fila-capacitor.js",
+		"fila-capacitor.min.js",
+		"fila-capacitor.d.ts",
+		"fila-capacitor.d.ts.map",
+		"fila-capacitor.esm.js"
+	],
+	"scripts": {
+		"test": "exit 0",
+		"esm": "sed 's/\\/\\/+ //' ./+build/fila-capacitor.js > ./+build/fila-capacitor.esm.js",
+		"bundle": "tsc -p tsconfig.release.json && terser ./+build/fila-capacitor.debug.js > ./+build/fila-capacitor.min.js && npm run esm",
+		"release": "npm run bundle && cd ./+build && cp ../package.json ./package.json && np"
+	},
 	"dependencies": {
-		"@capacitor/filesystem": "^5.1.1"
+		"@capacitor/filesystem": "^5.1.1",
+		"fila-core": "^1.0.1"
 	}
 }

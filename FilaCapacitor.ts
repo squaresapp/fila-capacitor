@@ -2,7 +2,7 @@
 namespace FilaCapacitor
 {
 	/** */
-	const enum Directory
+	export const enum Directory
 	{
 		cache = "CACHE",
 		data = "DATA",
@@ -26,10 +26,10 @@ namespace FilaCapacitor
 		class FilaCapacitor extends Fila
 		{
 			/** */
-			static use()
+			static _ = (() =>
 			{
 				Fila.setDefaults(FilaCapacitor, sep, cwd, tmp);
-			}
+			})();
 			
 			/** */
 			private get fs()
@@ -298,10 +298,18 @@ namespace FilaCapacitor
 				return result;
 			}
 		}
-		
-		FilaCapacitor.use();
 	}
-	
-	declare const module: any;
-	typeof module === "object" && Object.assign(module.exports, { FilaCapacitor });
 }
+
+//@ts-ignore CommonJS compatibility
+typeof module === "object" && Object.assign(module.exports, { FilaCapacitor });
+
+// ES module compatibility
+declare module "@scrollapp/fila-capacitor"
+{
+	const __export: { FilaCapacitor: typeof FilaCapacitor };
+	export = __export;
+}
+
+// The comment and + prefix is removed during npm run bundle
+//+ export { FilaCapacitor }
