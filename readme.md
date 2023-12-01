@@ -1,3 +1,7 @@
-# Fila Backend For Capacitor
+# Fila Backend For CapacitorJS
 
-Readme coming
+Installation:
+
+```
+npm install fila-core fila-capacitor
+```
