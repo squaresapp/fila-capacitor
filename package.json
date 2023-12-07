@@ -31,7 +31,7 @@
 		"test": "exit 0",
 		"esm": "sed 's/\\/\\/+ //' ./+build/fila-capacitor.js > ./+build/fila-capacitor.esm.js",
 		"bundle": "tsc -p tsconfig.release.json && terser ./+build/fila-capacitor.debug.js > ./+build/fila-capacitor.min.js && npm run esm",
-		"release": "npm run bundle && cd ./+build && cp ../package.json ./package.json && np"
+		"release": "npm run bundle && cd ./+build && cp ../package.json ./package.json && np && cp ./package.json ../package.json"
 	},
 	"dependencies": {
 		"@capacitor/filesystem": "^5.1.1",
