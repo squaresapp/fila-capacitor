@@ -305,7 +305,7 @@ namespace FilaCapacitor
 typeof module === "object" && Object.assign(module.exports, { FilaCapacitor });
 
 // ES module compatibility
-declare module "@scrollapp/fila-capacitor"
+declare module "fila-capacitor"
 {
 	const __export: { FilaCapacitor: typeof FilaCapacitor };
 	export = __export;
